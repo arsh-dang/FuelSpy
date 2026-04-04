@@ -1,0 +1,65 @@
+
+
+services:
+  redis: 
+    image: redis:8.2
+    ports:
+      - '${REDIS_PORT}:6379'
+    volumes:
+      - redis-data:/data
+    environment:
+      - REDIS_ARGS=--requirepass ${REDIS_PASSWORD} --appendonly yes
+    restart: unless-stopped
+    networks:
+      - app-network
+  
+  postgres:
+    image: postgres:17 # Using PostgreSQL version 17
+    container_name: local-central-db-pgsql-container-17
+    restart: unless-stopped
+    ports:
+      - "${DB_PORT}:5432" # Expose port 5432 for external access
+    environment:
+      POSTGRES_USER: ${DB_USER} # Replace with your username
+      POSTGRES_PASSWORD: ${DB_PASSWORD} # Replace with your password
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - ./dbdata:/var/lib/postgresql/data # Persist data between restarts
+    networks:
+      - app-network
+
+  backend: 
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - '${BACKEND_PORT}:8000'
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - REDIS_HOST=redis
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - '${FRONTEND_PORT}:3000'
+    networks:
+      - app-network
+
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  redis-data:
+    driver: local
