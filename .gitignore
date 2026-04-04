@@ -1,2 +1,48 @@
+# Environment variables
 .env
+.env.local
+.env.*.local
+
+
+# Database
 /dbdata/
+
+
+# Alembic migrations (versions are auto-generated)
+/backend/alembic/versions
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node (for frontend)
+node_modules/
+npm-debug.log
+yarn-error.log
+.next/
+out/
+dist/
+
+# Logs
+*.log
+logs/
