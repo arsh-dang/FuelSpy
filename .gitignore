@@ -8,9 +8,6 @@
 /dbdata/
 
 
-# Alembic migrations (versions are auto-generated)
-/backend/alembic/versions
-
 # Python
 __pycache__/
 *.py[cod]
