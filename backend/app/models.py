@@ -1,7 +1,7 @@
 from sqlalchemy import Integer, String, Float, DateTime, ForeignKey
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from datetime import datetime
-from database import Base
+from app.database import Base
 
     
 class Stations(Base):
@@ -15,12 +15,16 @@ class Stations(Base):
     brand: Mapped[str] = mapped_column(String, nullable=False)
     
     prices: Mapped[list["Prices"]] = relationship("Prices", back_populates="station")
+    price_history: Mapped[list["PriceHistory"]] = relationship("PriceHistory", back_populates="station")
     
 class FuelTypes(Base):
     __tablename__ = "fuel_types"
     
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     name: Mapped[str] = mapped_column(String, nullable=False)
+    
+    prices: Mapped[list["Prices"]] = relationship("Prices", back_populates="fuel_type")
+    price_history: Mapped[list["PriceHistory"]] = relationship("PriceHistory", back_populates="fuel_type")
     
 class Prices(Base):
     __tablename__ = "prices"
@@ -32,6 +36,7 @@ class Prices(Base):
     fetched_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
     
     station: Mapped["Stations"] = relationship("Stations", back_populates="prices")
+    fuel_type: Mapped["FuelTypes"] = relationship("FuelTypes", back_populates="prices")
     
 class PriceHistory(Base):
     __tablename__ = "price_history"
@@ -41,3 +46,6 @@ class PriceHistory(Base):
     fuel_type_id: Mapped[int] = mapped_column(Integer, ForeignKey("fuel_types.id"), nullable=False)
     price_cents: Mapped[float] = mapped_column(Float, nullable=False)
     fetched_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    
+    station: Mapped["Stations"] = relationship("Stations", back_populates="price_history")
+    fuel_type: Mapped["FuelTypes"] = relationship("FuelTypes", back_populates="price_history")
