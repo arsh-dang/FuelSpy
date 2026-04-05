@@ -1,7 +1,1 @@
-from fastapi import FastAPI
-
-app = FastAPI()
-
-@app.get("/")
-def read_root():
-    return {"message": "FuelSpy API is running"}
+from app.routes.stations import app
