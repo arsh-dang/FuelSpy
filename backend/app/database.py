@@ -2,7 +2,6 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
 from pydantic_settings import BaseSettings
 from urllib.parse import quote_plus
-import os
 from typing import AsyncGenerator
 
 class Settings(BaseSettings):
@@ -13,8 +12,7 @@ class Settings(BaseSettings):
     db_name: str = "fuelspy"
     
     class Config:
-        env_file = os.path.join(os.path.dirname(__file__), "../../.env")
-        extra = "ignore"  # Ignore extra fields from .env
+        env_file = "../../.env"
     
     @property
     def database_url(self) -> str:
