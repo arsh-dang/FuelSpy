@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, timedelta
 from sqlalchemy import select, and_, func
-from sqlalchemy.orm import selectinload, contains_eager
+from sqlalchemy.orm import selectinload
 from typing import Annotated
 
 from app import schemas, models
