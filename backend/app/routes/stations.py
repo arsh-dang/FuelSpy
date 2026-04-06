@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import datetime, timedelta
 from sqlalchemy import select, and_, func
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import selectinload, contains_eager
 from typing import Annotated
 
 from app import schemas, models
@@ -21,25 +21,45 @@ async def stations_data(fuel_type: str | None = None,
                         latitude: float | None = None,
                         longitude: float | None = None,
                         session: Annotated[AsyncSession, Depends(get_session)] = None):
-    query = select(models.Stations).options(
-        selectinload(models.Stations.prices).selectinload(models.Prices.fuel_type)
-    )
+    query = select(models.Stations)
 
-    needs_price_join = fuel_type is not None or sort is not None
+    needs_price_join = sort is not None
 
-    if needs_price_join:
-        query = query.join(models.Prices)
-
+    # Filter which stations (always when fuel_type set)
     if fuel_type is not None:
-        query = query.join(models.FuelTypes).where(models.FuelTypes.name == fuel_type)
+        stations_ids = select(models.Prices.station_id).join(models.FuelTypes).where(
+            models.FuelTypes.name == fuel_type
+        )
+        query = query.where(models.Stations.id.in_(stations_ids))
+
+
+    # Join for sorting (only when sort is set)
+    if needs_price_join:
+        if fuel_type is not None:
+            query = query.join(models.Prices).join(models.FuelTypes).where(
+                models.FuelTypes.name == fuel_type
+            )
+        else:
+            query = query.join(models.Prices)
+        query = query.group_by(models.Stations.id)
+        
+    # Eager load prices while the session is open, lazy loading loads the prices when the session is off (creating an error)
+    if fuel_type is not None:
+        ft_subquery = select(models.FuelTypes.id).where(models.FuelTypes.name == fuel_type)
+        query = query.options(
+            selectinload(models.Stations.prices.and_(models.Prices.fuel_type_id.in_(ft_subquery)))
+            .selectinload(models.Prices.fuel_type)
+        ) 
+    else:
+        query = query.options(
+            selectinload(models.Stations.prices).selectinload(models.Prices.fuel_type)
+        )
 
     if sort == "price_asc":
         query = query.order_by(func.min(models.Prices.price_cents))
     elif sort == "price_desc":
         query = query.order_by(func.min(models.Prices.price_cents).desc())
 
-    if needs_price_join:
-        query = query.group_by(models.Stations.id)
 
     results = await session.execute(query)
     stations = results.scalars().all()
