@@ -76,7 +76,7 @@ steps:
       - push-frontend
 
 options:
-  logging: NONE
+  defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
 
 images:
   - ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/backend:$SHORT_SHA
