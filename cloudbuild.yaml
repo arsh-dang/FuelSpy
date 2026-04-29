@@ -1,7 +1,4 @@
 substitutions:
-  _REGION: australia-southeast1
-  _CLUSTER: fuelspy-cluster
-  _ZONE: australia-southeast1-a
   _BACKEND_URL: http://34.116.125.150:8000
 
 steps:
@@ -10,9 +7,7 @@ steps:
     args:
       - build
       - -t
-      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/backend:$SHORT_SHA
-      - -t
-      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/backend:latest
+      - fuelspy-backend:$SHORT_SHA
       - ./backend
 
   - name: gcr.io/cloud-builders/docker
@@ -22,63 +17,8 @@ steps:
       - --build-arg
       - NEXT_PUBLIC_API_BASE_URL=${_BACKEND_URL}
       - -t
-      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/frontend:$SHORT_SHA
-      - -t
-      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/frontend:latest
+      - fuelspy-frontend:$SHORT_SHA
       - ./frontend
 
-  - name: gcr.io/cloud-builders/docker
-    id: push-backend
-    args:
-      - push
-      - --all-tags
-      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/backend
-    waitFor:
-      - build-backend
-
-  - name: gcr.io/cloud-builders/docker
-    id: push-frontend
-    args:
-      - push
-      - --all-tags
-      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/frontend
-    waitFor:
-      - build-frontend
-
-  - name: gcr.io/cloud-builders/kubectl
-    id: deploy-backend
-    args:
-      - set
-      - image
-      - deployment/fuelspy-backend
-      - backend=${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/backend:$SHORT_SHA
-      - -n
-      - fuelspy
-    env:
-      - CLOUDSDK_COMPUTE_ZONE=${_ZONE}
-      - CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER}
-    waitFor:
-      - push-backend
-
-  - name: gcr.io/cloud-builders/kubectl
-    id: deploy-frontend
-    args:
-      - set
-      - image
-      - deployment/fuelspy-frontend
-      - frontend=${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/frontend:$SHORT_SHA
-      - -n
-      - fuelspy
-    env:
-      - CLOUDSDK_COMPUTE_ZONE=${_ZONE}
-      - CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER}
-    waitFor:
-      - push-frontend
-
 options:
-  defaultLogsBucketBehavior: REGIONAL_USER_OWNED_BUCKET
-
-images:
-  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/backend:$SHORT_SHA
-  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/frontend:$SHORT_SHA
-
+  logging: NONE
