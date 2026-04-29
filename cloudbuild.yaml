@@ -2,7 +2,7 @@ substitutions:
   _REGION: australia-southeast1
   _CLUSTER: fuelspy-cluster
   _ZONE: australia-southeast1-a
-  _BACKEND_URL: http://BACKEND_EXTERNAL_IP:8000
+  _BACKEND_URL: http://35.189.33.178:8000
 
 steps:
   - name: gcr.io/cloud-builders/docker

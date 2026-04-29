@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: REGION-docker.pkg.dev/PROJECT_ID/fuelspy/backend:latest
+          image: arshdang/fuelspy-backend:latest
           ports:
             - containerPort: 8000
           env:
@@ -50,7 +50,7 @@ spec:
                   name: fuelspy-secrets
                   key: FAIR_FUEL_CONSUMER_ID
             - name: CORS_ORIGINS
-              value: "http://FRONTEND_EXTERNAL_IP"
+              value: "http://35.201.30.132"
 ---
 apiVersion: v1
 kind: Service
