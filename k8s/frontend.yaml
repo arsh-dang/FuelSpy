@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fuelspy-frontend
+  namespace: fuelspy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fuelspy-frontend
+  template:
+    metadata:
+      labels:
+        app: fuelspy-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: REGION-docker.pkg.dev/PROJECT_ID/fuelspy/frontend:latest
+          ports:
+            - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fuelspy-frontend
+  namespace: fuelspy
+spec:
+  selector:
+    app: fuelspy-frontend
+  ports:
+    - port: 80
+      targetPort: 3000
+  type: LoadBalancer

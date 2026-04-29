@@ -43,3 +43,6 @@ dist/
 # Logs
 *.log
 logs/
+
+# Kubernetes secrets (apply manually with kubectl)
+k8s/secrets.yaml

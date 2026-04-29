@@ -1,0 +1,70 @@
+substitutions:
+  _REGION: australia-southeast1
+  _CLUSTER: fuelspy-cluster
+  _ZONE: australia-southeast1-a
+  _BACKEND_URL: http://BACKEND_EXTERNAL_IP:8000
+
+steps:
+  - name: gcr.io/cloud-builders/docker
+    id: build-backend
+    args:
+      - build
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/backend:$SHORT_SHA
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/backend:latest
+      - ./backend
+
+  - name: gcr.io/cloud-builders/docker
+    id: build-frontend
+    args:
+      - build
+      - --build-arg
+      - NEXT_PUBLIC_API_BASE_URL=${_BACKEND_URL}
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/frontend:$SHORT_SHA
+      - -t
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/frontend:latest
+      - ./frontend
+
+  - name: gcr.io/cloud-builders/docker
+    id: push-backend
+    args: [push, --all-tags, ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/backend]
+    waitFor: [build-backend]
+
+  - name: gcr.io/cloud-builders/docker
+    id: push-frontend
+    args: [push, --all-tags, ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/frontend]
+    waitFor: [build-frontend]
+
+  - name: gcr.io/cloud-builders/kubectl
+    id: deploy-backend
+    args:
+      - set
+      - image
+      - deployment/fuelspy-backend
+      - backend=${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/backend:$SHORT_SHA
+      - -n
+      - fuelspy
+    env:
+      - CLOUDSDK_COMPUTE_ZONE=${_ZONE}
+      - CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER}
+    waitFor: [push-backend]
+
+  - name: gcr.io/cloud-builders/kubectl
+    id: deploy-frontend
+    args:
+      - set
+      - image
+      - deployment/fuelspy-frontend
+      - frontend=${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/frontend:$SHORT_SHA
+      - -n
+      - fuelspy
+    env:
+      - CLOUDSDK_COMPUTE_ZONE=${_ZONE}
+      - CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER}
+    waitFor: [push-frontend]
+
+images:
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/backend:$SHORT_SHA
+  - ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/frontend:$SHORT_SHA

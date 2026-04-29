@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fuelspy-backend
+  namespace: fuelspy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fuelspy-backend
+  template:
+    metadata:
+      labels:
+        app: fuelspy-backend
+    spec:
+      containers:
+        - name: backend
+          image: REGION-docker.pkg.dev/PROJECT_ID/fuelspy/backend:latest
+          ports:
+            - containerPort: 8000
+          env:
+            - name: DB_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: fuelspy-config
+                  key: DB_HOST
+            - name: DB_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: fuelspy-config
+                  key: DB_PORT
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: fuelspy-config
+                  key: DB_USER
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: fuelspy-config
+                  key: DB_NAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: fuelspy-secrets
+                  key: DB_PASSWORD
+            - name: FAIR_FUEL_CONSUMER_ID
+              valueFrom:
+                secretKeyRef:
+                  name: fuelspy-secrets
+                  key: FAIR_FUEL_CONSUMER_ID
+            - name: CORS_ORIGINS
+              value: "http://FRONTEND_EXTERNAL_IP"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fuelspy-backend
+  namespace: fuelspy
+spec:
+  selector:
+    app: fuelspy-backend
+  ports:
+    - port: 8000
+      targetPort: 8000
+  type: LoadBalancer
