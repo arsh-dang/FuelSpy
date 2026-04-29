@@ -81,3 +81,4 @@ options:
 images:
   - ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/backend:$SHORT_SHA
   - ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/frontend:$SHORT_SHA
+
