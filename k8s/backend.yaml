@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: arshdang/fuelspy-backend:latest
+          image: arshdang/fuelspy-backend:v2
           ports:
             - containerPort: 8000
           env:
