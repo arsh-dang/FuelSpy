@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from sqlalchemy import select, and_, func
 from sqlalchemy.orm import selectinload
 from typing import Annotated
+from app.services.fuel_fetcher import fetch_and_store_prices
 
 from app import schemas, models
 from app.database import get_session
@@ -14,6 +15,15 @@ app = FastAPI()
 @app.get("/")
 async def read_root():
     return {"message": "FuelSpy API"}
+
+@app.get("/health")
+async def health():
+    return {"status": "healthy"}
+
+@app.post("/api/admin/fetch-prices")
+async def trigger_fetch(session: Annotated[AsyncSession, Depends(get_session)] = None):
+    count = await fetch_and_store_prices(session)
+    return {"stations_updated": count}
 
 @app.get("/api/stations/", response_model=list[schemas.StationListResponse])
 async def stations_data(fuel_type: str | None = None,

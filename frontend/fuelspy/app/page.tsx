@@ -8,7 +8,7 @@ import { Station } from "./lib/api";
 export default function Home(){
     const {stations, loading, error, fetchStationsData} = useStations();
     const [search, setSearch] = useState("");
-    const fuelTypes = ["All","E10","U91","U95","U98","Diesel"];
+    const fuelTypes = ["All", "E10", "U91", "P95", "P98", "DSL", "PDSL", "LPG", "E85", "LNG"];
     const [preferredFuelType, setFuelType] = useState(fuelTypes[0]);
     const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 

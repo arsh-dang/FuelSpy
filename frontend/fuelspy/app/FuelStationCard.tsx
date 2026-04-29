@@ -9,12 +9,18 @@ interface fuelCardProps {
 }
 
 const fuelTypeColors: Record<string, string> = {
-    E10: "bg-green-100 text-green-700",
-    U91: "bg-blue-100 text-blue-700",
-    U95: "bg-purple-100 text-purple-700",
-    U98: "bg-orange-100 text-orange-700",
-    Diesel: "bg-gray-200 text-gray-700",
+    E10:  "bg-green-100 text-green-700",
+    U91:  "bg-blue-100 text-blue-700",
+    P95:  "bg-purple-100 text-purple-700",
+    P98:  "bg-orange-100 text-orange-700",
+    DSL:  "bg-gray-200 text-gray-700",
+    PDSL: "bg-yellow-100 text-yellow-700",
+    LPG:  "bg-teal-100 text-teal-700",
+    E85:  "bg-lime-100 text-lime-700",
+    LNG:  "bg-cyan-100 text-cyan-700",
 }
+
+
 
 export function fuelCard({id, name, address, brand, prices}: fuelCardProps) {
     return (
