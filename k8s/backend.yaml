@@ -50,7 +50,7 @@ spec:
                   name: fuelspy-secrets
                   key: FAIR_FUEL_CONSUMER_ID
             - name: CORS_ORIGINS
-              value: "http://35.201.30.132"
+              value: "http://35.189.33.178"
 ---
 apiVersion: v1
 kind: Service
