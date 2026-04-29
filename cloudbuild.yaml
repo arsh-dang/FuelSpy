@@ -2,7 +2,7 @@ substitutions:
   _REGION: australia-southeast1
   _CLUSTER: fuelspy-cluster
   _ZONE: australia-southeast1-a
-  _BACKEND_URL: http://35.189.33.178:8000
+  _BACKEND_URL: http://34.116.125.150:8000
 
 steps:
   - name: gcr.io/cloud-builders/docker
@@ -29,13 +29,21 @@ steps:
 
   - name: gcr.io/cloud-builders/docker
     id: push-backend
-    args: [push, --all-tags, ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/backend]
-    waitFor: [build-backend]
+    args:
+      - push
+      - --all-tags
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/backend
+    waitFor:
+      - build-backend
 
   - name: gcr.io/cloud-builders/docker
     id: push-frontend
-    args: [push, --all-tags, ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/frontend]
-    waitFor: [build-frontend]
+    args:
+      - push
+      - --all-tags
+      - ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/frontend
+    waitFor:
+      - build-frontend
 
   - name: gcr.io/cloud-builders/kubectl
     id: deploy-backend
@@ -49,7 +57,8 @@ steps:
     env:
       - CLOUDSDK_COMPUTE_ZONE=${_ZONE}
       - CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER}
-    waitFor: [push-backend]
+    waitFor:
+      - push-backend
 
   - name: gcr.io/cloud-builders/kubectl
     id: deploy-frontend
@@ -63,7 +72,8 @@ steps:
     env:
       - CLOUDSDK_COMPUTE_ZONE=${_ZONE}
       - CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTER}
-    waitFor: [push-frontend]
+    waitFor:
+      - push-frontend
 
 images:
   - ${_REGION}-docker.pkg.dev/$PROJECT_ID/fuelspy/backend:$SHORT_SHA
