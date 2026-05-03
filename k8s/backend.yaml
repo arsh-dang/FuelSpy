@@ -55,7 +55,7 @@ spec:
                   name: fuelspy-secrets
                   key: FAIR_FUEL_CONSUMER_ID
             - name: CORS_ORIGINS
-              value: "http://34.87.192.40"
+              value: "http://35.244.77.225"
           livenessProbe:
             httpGet:
               path: /health

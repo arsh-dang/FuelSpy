@@ -1,5 +1,5 @@
 substitutions:
-  _BACKEND_URL: http://34.116.75.106:8000
+  _BACKEND_URL: http://34.40.222.142:8000
 
 steps:
   - name: gcr.io/cloud-builders/docker
