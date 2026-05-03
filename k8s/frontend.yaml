@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: arshdang/fuelspy-frontend:v2
+          image: arshdang/fuelspy-frontend:v3
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
